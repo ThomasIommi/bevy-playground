@@ -13,3 +13,8 @@ pub(crate) const PADDLE_Y: f32 = WALL_BOTTOM + 60.;
 pub(crate) const PADDLE_SIZE: Vec2 = Vec2::new(120., 20.);
 pub(crate) const PADDLE_COLOR: Color = Color::oklch(0.7, 0.1, 115.);
 pub(crate) const PADDLE_SPEED: f32 = 750.;
+pub(crate) const BALL_COLOR: Color = Color::oklch(0.4765, 0.1924, 341.);
+pub(crate) const BALL_DIAMETER: f32 = 25.;
+pub(crate) const BALL_Y: f32 = PADDLE_Y + (PADDLE_SIZE.y / 2.) + (BALL_DIAMETER / 2.);
+pub(crate) const BALL_SIZE: Vec2 = Vec2::splat(BALL_DIAMETER);
+

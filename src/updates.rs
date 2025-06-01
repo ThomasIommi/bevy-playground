@@ -1,4 +1,4 @@
-use crate::components::Paddle;
+use crate::components::{Ball, Paddle};
 use crate::constants::{PADDLE_SIZE, PADDLE_SPEED, WALL_LEFT, WALL_RIGHT, WALL_THICKNESS};
 use bevy::input::ButtonInput;
 use bevy::prelude::{KeyCode, Res, Single, Transform, With};
@@ -22,4 +22,11 @@ pub(crate) fn puddle_movement(
         let right_bound = WALL_RIGHT - WALL_THICKNESS / 2. - PADDLE_SIZE.x / 2.;
         paddle_transform.translation.x = new_position.clamp(left_bound, right_bound);
     }
+}
+
+pub(crate) fn ball_movement(
+    mut paddle_transform: Single<&mut Transform, With<Ball>>,
+    time: Res<Time>,
+) {
+    
 }

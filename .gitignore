@@ -28,4 +28,7 @@ target/
 # MSVC Windows builds of rustc generate these, which store debugging information
 *.pdb
 
+# Rust Rover
+.idea
+
 # End of https://www.toptal.com/developers/gitignore/api/linux,rust
