@@ -1,7 +1,7 @@
-use crate::components::{Ball, Paddle};
+use crate::components::{Ball, Paddle, Velocity};
 use crate::constants::{PADDLE_SIZE, PADDLE_SPEED, WALL_LEFT, WALL_RIGHT, WALL_THICKNESS};
 use bevy::input::ButtonInput;
-use bevy::prelude::{KeyCode, Res, Single, Transform, With};
+use bevy::prelude::{KeyCode, Query, Res, Single, Transform, With};
 use bevy::time::Time;
 
 pub(crate) fn puddle_movement(
@@ -24,9 +24,12 @@ pub(crate) fn puddle_movement(
     }
 }
 
-pub(crate) fn ball_movement(
-    mut paddle_transform: Single<&mut Transform, With<Ball>>,
+pub(crate) fn velocity_update(
+    mut query: Query<(&mut Transform, &Velocity)>,
     time: Res<Time>,
 ) {
-    
+   for (mut transform, velocity) in &mut query {
+       transform.translation.x += velocity.x * time.delta_secs();
+       transform.translation.y += velocity.y * time.delta_secs();
+   } 
 }

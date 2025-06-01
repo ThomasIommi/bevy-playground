@@ -1,6 +1,6 @@
 use bevy::asset::Assets;
-use crate::components::{Ball, Paddle, Wall};
-use crate::constants::{BALL_COLOR, BALL_SIZE, BALL_Y, PADDLE_COLOR, PADDLE_SIZE, PADDLE_Y, WALL_COLOR};
+use crate::components::{Ball, Paddle, Velocity, Wall};
+use crate::constants::{BALL_COLOR, BALL_SIZE, BALL_SPEED, BALL_Y, PADDLE_COLOR, PADDLE_SIZE, PADDLE_Y, WALL_COLOR};
 use crate::models::WallLocation;
 use bevy::math::{Vec2, Vec3};
 use bevy::prelude::{Bundle, Camera2d, Circle, ColorMaterial, Commands, Mesh, Mesh2d, ResMut, Sprite, Transform};
@@ -17,7 +17,7 @@ pub(crate) fn setup(mut commands: Commands,
     commands.spawn(make_wall(WallLocation::Right));
     commands.spawn(make_wall(WallLocation::Bottom));
     commands.spawn(make_wall(WallLocation::Left));
-    
+
     commands.spawn(make_ball(&mut meshes, &mut materials));
 }
 
@@ -50,6 +50,7 @@ fn make_ball(meshes: &mut ResMut<Assets<Mesh>>,
              materials: &mut ResMut<Assets<ColorMaterial>>) -> impl Bundle {
     (
         Ball,
+        Velocity(Vec2::new(1., 1.).normalize() * BALL_SPEED),
         Mesh2d(meshes.add(Circle::default())),
         MeshMaterial2d(materials.add(BALL_COLOR)),
         Transform {

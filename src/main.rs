@@ -1,6 +1,6 @@
 use crate::constants::BACKGROUND_CLEAR_COLOR;
 use crate::setup::setup;
-use crate::updates::{ball_movement, puddle_movement};
+use crate::updates::{velocity_update, puddle_movement};
 use bevy::app::{App, FixedUpdate, Startup};
 use bevy::DefaultPlugins;
 
@@ -17,7 +17,7 @@ fn main() {
         .add_systems(Startup, setup)
         .add_systems(FixedUpdate, (
             puddle_movement,
-            ball_movement
+            velocity_update
         ))
         .run();
 }
