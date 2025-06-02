@@ -12,3 +12,6 @@ pub(crate) struct Ball;
 
 #[derive(Component, Deref, DerefMut)]
 pub(crate) struct Velocity(pub(crate) Vec2);
+
+#[derive(Component)]
+pub(crate) struct Collider;

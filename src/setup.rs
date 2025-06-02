@@ -1,4 +1,4 @@
-use crate::components::{Ball, Paddle, Velocity, Wall};
+use crate::components::{Ball, Collider, Paddle, Velocity, Wall};
 use crate::constants::{BALL_COLOR, BALL_SIZE, BALL_SPEED, BALL_Y, PADDLE_COLOR, PADDLE_SIZE, PADDLE_Y, WALL_COLOR};
 use crate::models::WallLocation;
 use bevy::asset::Assets;
@@ -25,6 +25,7 @@ pub(crate) fn setup(mut commands: Commands,
 fn make_puddle() -> impl Bundle {
     (
         Paddle,
+        Collider,
         Sprite::from_color(PADDLE_COLOR, Vec2::ONE),
         Transform {
             translation: Vec3::new(0.0, PADDLE_Y, 0.0),
@@ -37,6 +38,7 @@ fn make_puddle() -> impl Bundle {
 fn make_wall(location: WallLocation) -> impl Bundle {
     (
         Wall,
+        Collider,
         Sprite::from_color(WALL_COLOR, Vec2::ONE),
         Transform {
             translation: location.position().extend(0.0),

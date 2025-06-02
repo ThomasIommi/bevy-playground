@@ -1,4 +1,4 @@
-use crate::components::{Ball, Paddle, Velocity, Wall};
+use crate::components::{Ball, Collider, Paddle, Velocity, Wall};
 use crate::constants::{BALL_DIAMETER, PADDLE_SIZE, PADDLE_SPEED, WALL_LEFT, WALL_RIGHT, WALL_THICKNESS};
 use crate::event::CollisionEvent;
 use crate::models::Collision;
@@ -40,14 +40,14 @@ pub(crate) fn apply_velocity(
 
 pub(crate) fn detect_ball_collision(
     ball_query: Single<(&Transform, &mut Velocity), With<Ball>>,
-    walls_query: Query<(Entity, &Transform), With<Wall>>,
+    colliders_query: Query<(Entity, &Transform), With<Collider>>,
     mut collision_events_writer: EventWriter<CollisionEvent>,
 ) {
     let (ball_transform, mut ball_velocity) = ball_query.into_inner();
-    for (entity, wall_transform) in walls_query {
+    for (entity, collider_transform) in colliders_query {
         let collision = detect_collision(
             BoundingCircle::new(ball_transform.translation.truncate(), BALL_DIAMETER / 2.),
-            Aabb2d::new(wall_transform.translation.truncate(), wall_transform.scale.truncate() / 2.),
+            Aabb2d::new(collider_transform.translation.truncate(), collider_transform.scale.truncate() / 2.),
         );
         if let Some(collision) = collision {
             collision_events_writer.write(CollisionEvent::new(entity, collision));
