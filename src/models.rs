@@ -33,3 +33,11 @@ impl WallLocation {
         }
     }
 }
+
+
+pub(crate) enum Collision {
+    TOP,
+    RIGHT,
+    BOTTOM,
+    LEFT,
+}

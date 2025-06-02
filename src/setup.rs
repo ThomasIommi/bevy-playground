@@ -1,7 +1,7 @@
-use bevy::asset::Assets;
 use crate::components::{Ball, Paddle, Velocity, Wall};
 use crate::constants::{BALL_COLOR, BALL_SIZE, BALL_SPEED, BALL_Y, PADDLE_COLOR, PADDLE_SIZE, PADDLE_Y, WALL_COLOR};
 use crate::models::WallLocation;
+use bevy::asset::Assets;
 use bevy::math::{Vec2, Vec3};
 use bevy::prelude::{Bundle, Camera2d, Circle, ColorMaterial, Commands, Mesh, Mesh2d, ResMut, Sprite, Transform};
 use bevy::sprite::MeshMaterial2d;

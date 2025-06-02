@@ -1,10 +1,14 @@
-use crate::components::{Ball, Paddle, Velocity};
-use crate::constants::{PADDLE_SIZE, PADDLE_SPEED, WALL_LEFT, WALL_RIGHT, WALL_THICKNESS};
+use crate::components::{Ball, Paddle, Velocity, Wall};
+use crate::constants::{BALL_DIAMETER, PADDLE_SIZE, PADDLE_SPEED, WALL_LEFT, WALL_RIGHT, WALL_THICKNESS};
+use crate::event::CollisionEvent;
+use crate::models::Collision;
 use bevy::input::ButtonInput;
-use bevy::prelude::{KeyCode, Query, Res, Single, Transform, With};
+use bevy::math::bounding::{Aabb2d, BoundingCircle, BoundingVolume, IntersectsVolume};
+use bevy::math::ops::abs;
+use bevy::prelude::{Entity, EventReader, EventWriter, KeyCode, Query, Res, Single, Transform, With};
 use bevy::time::Time;
 
-pub(crate) fn puddle_movement(
+pub(crate) fn move_paddle(
     keyboard_input: Res<ButtonInput<KeyCode>>,
     mut paddle_transform: Single<&mut Transform, With<Paddle>>,
     time: Res<Time>,
@@ -24,12 +28,67 @@ pub(crate) fn puddle_movement(
     }
 }
 
-pub(crate) fn velocity_update(
+pub(crate) fn apply_velocity(
     mut query: Query<(&mut Transform, &Velocity)>,
     time: Res<Time>,
 ) {
-   for (mut transform, velocity) in &mut query {
-       transform.translation.x += velocity.x * time.delta_secs();
-       transform.translation.y += velocity.y * time.delta_secs();
-   } 
+    for (mut transform, velocity) in &mut query {
+        transform.translation.x += velocity.x * time.delta_secs();
+        transform.translation.y += velocity.y * time.delta_secs();
+    }
+}
+
+pub(crate) fn detect_ball_collision(
+    ball_query: Single<(&Transform, &mut Velocity), With<Ball>>,
+    walls_query: Query<(Entity, &Transform), With<Wall>>,
+    mut collision_events_writer: EventWriter<CollisionEvent>,
+) {
+    let (ball_transform, mut ball_velocity) = ball_query.into_inner();
+    for (entity, wall_transform) in walls_query {
+        let collision = detect_collision(
+            BoundingCircle::new(ball_transform.translation.truncate(), BALL_DIAMETER / 2.),
+            Aabb2d::new(wall_transform.translation.truncate(), wall_transform.scale.truncate() / 2.),
+        );
+        if let Some(collision) = collision {
+            collision_events_writer.write(CollisionEvent::new(entity, collision));
+        }
+    }
+}
+
+fn detect_collision(ball: BoundingCircle, bounding_box: Aabb2d) -> Option<Collision> {
+    if !ball.intersects(&bounding_box) {
+        return None;
+    }
+
+    let closest_point = bounding_box.closest_point(ball.center());
+    let offset = ball.center() - closest_point;
+    let collision = if offset.x.abs() > offset.y.abs() {
+        if (offset.x < 0.) {
+            Collision::LEFT
+        } else {
+            Collision::RIGHT
+        }
+    } else {
+        if (offset.y > 0.) {
+            Collision::TOP
+        } else {
+            Collision::BOTTOM
+        }
+    };
+    Some(collision)
+}
+
+pub(crate) fn handle_ball_bounce(
+    ball_query: Single<&mut Velocity, With<Ball>>,
+    mut collision_event: EventReader<CollisionEvent>,
+) {
+    let mut velocity = ball_query.into_inner();
+    for event in collision_event.read() {
+        match event.collision {
+            Collision::TOP => velocity.y = abs(velocity.y),
+            Collision::RIGHT => velocity.x = abs(velocity.x),
+            Collision::BOTTOM => velocity.y = -abs(velocity.y),
+            Collision::LEFT => velocity.x = -abs(velocity.x),
+        }
+    }
 }
