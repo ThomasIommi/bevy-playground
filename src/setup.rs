@@ -1,15 +1,19 @@
-use crate::components::{Ball, Collider, Paddle, Velocity, Wall};
-use crate::constants::{BALL_COLOR, BALL_SIZE, BALL_SPEED, BALL_Y, PADDLE_COLOR, PADDLE_SIZE, PADDLE_Y, WALL_COLOR};
+use crate::components::{Ball, Brick, Collider, Paddle, Velocity, Wall};
+use crate::constants::{BALL_COLOR, BALL_SIZE, BALL_SPEED, BALL_Y, BRICK_COLOR, PADDLE_COLOR, PADDLE_SIZE, PADDLE_Y, WALL_COLOR};
 use crate::models::WallLocation;
 use bevy::asset::Assets;
 use bevy::math::{Vec2, Vec3};
-use bevy::prelude::{Bundle, Camera2d, Circle, ColorMaterial, Commands, Mesh, Mesh2d, ResMut, Sprite, Transform};
+use bevy::prelude::{
+    Bundle, Camera2d, Circle, ColorMaterial, Commands, Mesh, Mesh2d, ResMut, Sprite, Transform,
+};
 use bevy::sprite::MeshMaterial2d;
 use bevy::utils::default;
 
-pub(crate) fn setup(mut commands: Commands,
-                    mut meshes: ResMut<Assets<Mesh>>,
-                    mut materials: ResMut<Assets<ColorMaterial>>) {
+pub(crate) fn setup(
+    mut commands: Commands,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<ColorMaterial>>,
+) {
     commands.spawn(Camera2d);
 
     commands.spawn(make_puddle());
@@ -19,6 +23,10 @@ pub(crate) fn setup(mut commands: Commands,
     commands.spawn(make_wall(WallLocation::Left));
 
     commands.spawn(make_ball(&mut meshes, &mut materials));
+
+    calculate_bricks_transform().for_each(|transform| {
+        commands.spawn(make_brick(transform));
+    });
 }
 
 // todo change into a struct Puddle, that derives Component and has an impl for a default init
@@ -48,8 +56,10 @@ fn make_wall(location: WallLocation) -> impl Bundle {
     )
 }
 
-fn make_ball(meshes: &mut ResMut<Assets<Mesh>>,
-             materials: &mut ResMut<Assets<ColorMaterial>>) -> impl Bundle {
+fn make_ball(
+    meshes: &mut ResMut<Assets<Mesh>>,
+    materials: &mut ResMut<Assets<ColorMaterial>>,
+) -> impl Bundle {
     (
         Ball,
         Velocity(Vec2::new(1., 1.).normalize() * BALL_SPEED),
@@ -59,6 +69,19 @@ fn make_ball(meshes: &mut ResMut<Assets<Mesh>>,
             translation: Vec3::new(0.0, BALL_Y, 0.0),
             scale: BALL_SIZE.extend(1.0),
             ..default()
-        }
+        },
+    )
+}
+
+fn calculate_bricks_transform() -> impl Iterator<Item = Transform> {
+    std::iter::empty::<Transform>()
+}
+
+fn make_brick(transform: Transform) -> impl Bundle {
+    (
+        Brick,
+        Collider,
+        Sprite::from_color(BRICK_COLOR, Vec2::ONE),
+        transform
     )
 }
